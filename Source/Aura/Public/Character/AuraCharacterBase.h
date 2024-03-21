@@ -12,7 +12,7 @@ class AURA_API AAuraCharacterBase : public ACharacter
 	GENERATED_BODY()
 
 public:
-	AAuraCharacterBase();
+	AAuraCharacterBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	virtual void BeginPlay() override;
