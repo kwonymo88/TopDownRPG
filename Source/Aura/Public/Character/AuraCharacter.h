@@ -14,5 +14,11 @@ class AURA_API AAuraCharacter : public AAuraCharacterBase
 {
 	GENERATED_BODY()
 
+public:
 	AAuraCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	void BeginPlay() override;
+	void OnRep_PlayerState() override;
+
+protected:
+	void InitAbilityActorInfo();
 };
