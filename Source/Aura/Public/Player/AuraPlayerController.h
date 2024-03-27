@@ -35,5 +35,5 @@ private:
 	void Move(const struct FInputActionValue& InputActionValue);
 	void UpdateCursor();
 
-	IEnemyInterface* LastHitEnemyInterface;
+	TObjectPtr<IEnemyInterface> LastHitEnemyInterface;
 };
