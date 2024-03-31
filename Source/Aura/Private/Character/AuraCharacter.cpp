@@ -37,18 +37,19 @@ void AAuraCharacter::OnRep_PlayerState()
 
 void AAuraCharacter::InitAbilityActorInfo()
 {
-	AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState());
-	ensure(AuraPlayerState);
-	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
-	AuraAttributeSet = AuraPlayerState->GetAttributeSet();
-	check(AbilitySystemComponent);
-	AbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
-
-	if (AAuraPlayerController* AuraPlayerController = GetController<AAuraPlayerController>())
+	if (AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState()))
 	{
-		if (AAuraHUD* AuraHUD = AuraPlayerController->GetHUD<AAuraHUD>())
+		AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
+		AuraAttributeSet = AuraPlayerState->GetAttributeSet();
+		check(AbilitySystemComponent);
+		AbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
+
+		if (AAuraPlayerController* AuraPlayerController = GetController<AAuraPlayerController>())
 		{
-			AuraHUD->InitOverlay(AuraPlayerController, GetPlayerState(), AuraAttributeSet, AbilitySystemComponent);
-		}	
+			if (AAuraHUD* AuraHUD = AuraPlayerController->GetHUD<AAuraHUD>())
+			{
+				AuraHUD->InitOverlay(AuraPlayerController, GetPlayerState(), AuraAttributeSet, AbilitySystemComponent);
+			}	
+		}
 	}
 }

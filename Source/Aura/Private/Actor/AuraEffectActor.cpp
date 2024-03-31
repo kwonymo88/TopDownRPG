@@ -4,9 +4,7 @@
 #include "Actor/AuraEffectActor.h"
 
 #include "AbilitySystemComponent.h"
-#include "AbilitySystemInterface.h"
-#include "AbilitySystem/AuraAttributeSet.h"
-#include "Components/SphereComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 // Sets default values
 AAuraEffectActor::AAuraEffectActor()
@@ -14,35 +12,81 @@ AAuraEffectActor::AAuraEffectActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
-	SetRootComponent(SphereComp);
-
-	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
-	StaticMeshComp->SetupAttachment(GetRootComponent());
+	SetRootComponent(CreateDefaultSubobject<USceneComponent>("RootSceneComponent"));
 }
 
-// Called when the game starts or when spawned
-void AAuraEffectActor::BeginPlay()
+void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass,
+	EEffectRemovalPolicy RemovalPolicy)
 {
-	Super::BeginPlay();
-	
-	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AAuraEffectActor::BeginOverlap);
-}
+	UAbilitySystemComponent* ASCComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	if (ASCComp == nullptr) return;
 
-void AAuraEffectActor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-	bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (const IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(OtherActor))
+	check(GameplayEffectClass);
+	if (GameplayEffectClass == nullptr) return;
+
+	FGameplayEffectContextHandle EffectContextHandle = ASCComp->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this);
+	const FGameplayEffectSpecHandle EffectSpecHandle = ASCComp->MakeOutgoingSpec(GameplayEffectClass, 1.f, EffectContextHandle);
+	const FActiveGameplayEffectHandle ActivateEffectHandle = ASCComp->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+
+	if (RemovalPolicy == EEffectRemovalPolicy::EEndOverlap)
 	{
-		const UAuraAttributeSet* AuraAttributeSet = Cast<UAuraAttributeSet>(ASCInterface->GetAbilitySystemComponent()->GetAttributeSet(UAuraAttributeSet::StaticClass()));
-		UAuraAttributeSet* MutableAuraAttributeSet = const_cast<UAuraAttributeSet*>(AuraAttributeSet);
-		MutableAuraAttributeSet->SetHealth(AuraAttributeSet->GetHealth() + 25.f);
-		Destroy();
+		ActivateEffectForRemoveList.Add(FActivateEffectData(RemovalPolicy, ASCComp, ActivateEffectHandle));
 	}
 }
 
-void AAuraEffectActor::EndOverlap(UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void AAuraEffectActor::OnBeginOverlap(AActor* TargetActor)
 {
+	for(const auto& ApplicationData : EffectApplicationDatas)
+	{
+		if (ApplicationData.AppliciatonPolicy == EEffectAppliciatonPolicy::EBeginOverlap)
+		{
+			ApplyEffectToTarget(TargetActor, ApplicationData.EffectClass, ApplicationData.RemovalPolicy);
+		}
+	}
 }
+
+void AAuraEffectActor::OnEndOverlap(AActor* TargetActor)
+{
+	for(const auto& ApplicationData : EffectApplicationDatas)
+	{
+		if (ApplicationData.AppliciatonPolicy == EEffectAppliciatonPolicy::EEndOverlap)
+		{
+			ApplyEffectToTarget(TargetActor, ApplicationData.EffectClass, ApplicationData.RemovalPolicy);
+		}
+	}
+
+	UAbilitySystemComponent* ASComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	if (ASComp == nullptr ) return;
+
+	TArray<FActivateEffectData> HandlesToRemove;
+	for(const auto& ApplicationData : EffectApplicationDatas)
+	{
+		for(const auto& ActivateEffect : ActivateEffectForRemoveList)
+		{
+			if (ActivateEffect.RemovalPolicy == ApplicationData.RemovalPolicy
+				&& ASComp == ActivateEffect.AbilitySystemComponent)
+			{
+				HandlesToRemove.Add(ActivateEffect);
+			}
+		}
+
+		for (const auto& EffectHandle : HandlesToRemove)
+		{
+			ASComp->RemoveActiveGameplayEffect(EffectHandle.ActivateEffectHandle, 1);
+			ActivateEffectForRemoveList.RemoveAll([EffectHandle](const FActivateEffectData& Data)
+			{
+				if (EffectHandle.ActivateEffectHandle == Data.ActivateEffectHandle
+					&& EffectHandle.RemovalPolicy == Data.RemovalPolicy)
+				{
+					return true;
+				}
+				return false;
+			});
+		}
+		
+		
+	}
+}
+
 
