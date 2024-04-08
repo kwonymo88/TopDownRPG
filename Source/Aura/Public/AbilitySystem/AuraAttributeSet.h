@@ -3,9 +3,37 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystemComponent.h"
 #include "AttributeSet.h"
+#include "AbilitySystemComponent.h"
+#include "GameplayEffectTypes.h"
 #include "AuraAttributeSet.generated.h"
+
+USTRUCT()
+struct FEffectproperties
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TWeakObjectPtr<UAbilitySystemComponent> SourceASComp;
+	UPROPERTY()
+	TWeakObjectPtr<AActor>		SourceAvatarActor;
+	UPROPERTY()
+	TWeakObjectPtr<AController> SourceController;
+	UPROPERTY()
+	TWeakObjectPtr<ACharacter> SourceCharacter;
+
+	UPROPERTY()
+	TWeakObjectPtr<UAbilitySystemComponent> TargetASComp;
+	UPROPERTY()
+	TWeakObjectPtr<AActor>		TargetAvatarActor;
+	UPROPERTY()
+	TWeakObjectPtr<AController> TargetController;
+	UPROPERTY()
+	TWeakObjectPtr<ACharacter> TargetCharacter;
+
+	UPROPERTY()
+	FGameplayEffectContextHandle EffectContextHandle;
+};
 
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
@@ -25,6 +53,7 @@ public:
 	UAuraAttributeSet();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 	
 public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing="OnRep_Helath", Category="Attributes|Vital")

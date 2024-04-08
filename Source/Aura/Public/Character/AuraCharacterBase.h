@@ -30,6 +30,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAuraAttributeSet> AuraAttributeSet;
 
+protected:
+	virtual void InitAbilityActorInfo(){}
+	
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAuraAttributeSet* GetAttributeSet() const { return AuraAttributeSet; }

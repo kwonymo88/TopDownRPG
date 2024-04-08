@@ -80,4 +80,7 @@ public:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Applied Effects")
 	TArray<FActivateEffectData> ActivateEffectForRemoveList;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	float GameplayEffectLevel = 1.f;
 };

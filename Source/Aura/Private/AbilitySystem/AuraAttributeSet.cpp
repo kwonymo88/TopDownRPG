@@ -2,6 +2,8 @@
 
 
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "GameplayEffectExtension.h"
+#include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
 
 UAuraAttributeSet::UAuraAttributeSet()
@@ -33,6 +35,44 @@ void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 	else if(Attribute == GetManaAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
+	}
+}
+
+void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+
+	
+	FGameplayEffectContextHandle EffectContextHandle = Data.EffectSpec.GetContext();
+
+	FEffectproperties NewEffectproperties;
+	NewEffectproperties.EffectContextHandle = EffectContextHandle;
+	NewEffectproperties.SourceASComp = EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+	if (NewEffectproperties.SourceASComp.IsValid()
+		&& NewEffectproperties.SourceASComp->AbilityActorInfo.IsValid())
+	{
+		NewEffectproperties.SourceAvatarActor = NewEffectproperties.SourceASComp->AbilityActorInfo.Get()->AvatarActor;
+		NewEffectproperties.SourceController = NewEffectproperties.SourceASComp->AbilityActorInfo.Get()->PlayerController;
+		if (NewEffectproperties.SourceController == nullptr
+			&& NewEffectproperties.SourceAvatarActor.IsValid())
+		{
+			if (const APawn* pSourcePawn = Cast<APawn>(NewEffectproperties.SourceAvatarActor))
+			{
+				NewEffectproperties.SourceController = pSourcePawn->GetController();
+			}
+		}
+		if (NewEffectproperties.SourceController.IsValid())
+		{
+			NewEffectproperties.SourceCharacter = NewEffectproperties.SourceController->GetPawn<ACharacter>();	
+		}
+	}
+	NewEffectproperties.TargetASComp = &Data.Target;
+	if (NewEffectproperties.TargetASComp.IsValid()
+		&& NewEffectproperties.TargetASComp->AbilityActorInfo.IsValid())
+	{
+		NewEffectproperties.TargetAvatarActor = NewEffectproperties.TargetASComp->AbilityActorInfo.Get()->AvatarActor;
+		NewEffectproperties.TargetController = NewEffectproperties.TargetASComp->AbilityActorInfo.Get()->PlayerController;
+		NewEffectproperties.TargetCharacter = Cast<ACharacter>(NewEffectproperties.TargetAvatarActor); 
 	}
 }
 

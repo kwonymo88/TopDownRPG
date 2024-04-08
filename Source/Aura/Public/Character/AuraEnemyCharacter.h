@@ -18,6 +18,9 @@ class AURA_API AAuraEnemyCharacter : public AAuraCharacterBase, public IEnemyInt
 protected:
 	AAuraEnemyCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+protected:
+	virtual void InitAbilityActorInfo() override;
+	
 public:
 	void BeginPlay() override;
 	
