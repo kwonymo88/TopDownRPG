@@ -44,6 +44,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 		AuraAttributeSet = AuraPlayerState->GetAttributeSet();
 		check(AbilitySystemComponent);
 		AbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
+		InitDefaultAttributes();
 		Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->InitAbilitySystemInfo();
 
 		if (AAuraPlayerController* AuraPlayerController = GetController<AAuraPlayerController>())
@@ -54,4 +55,11 @@ void AAuraCharacter::InitAbilityActorInfo()
 			}	
 		}
 	}
+}
+
+int32 AAuraCharacter::GetPlayerLevel() const
+{
+	const AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	return AuraPlayerState->GetPlayerLevel();
 }

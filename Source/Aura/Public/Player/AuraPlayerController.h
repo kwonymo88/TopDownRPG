@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "UObject/WeakInterfacePtr.h"
 #include "AuraPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -35,5 +36,5 @@ private:
 	void Move(const struct FInputActionValue& InputActionValue);
 	void UpdateCursor();
 
-	TObjectPtr<IEnemyInterface> LastHitEnemyInterface;
+	TWeakInterfacePtr<IEnemyInterface> LastHitEnemyInterface;
 };

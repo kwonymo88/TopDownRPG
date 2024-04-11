@@ -21,4 +21,9 @@ public:
 
 protected:
 	virtual void InitAbilityActorInfo() override;
+
+	// Begin ICombatInterface
+public:
+	virtual int32 GetPlayerLevel() const override;
+	// End ICombatInterface
 };

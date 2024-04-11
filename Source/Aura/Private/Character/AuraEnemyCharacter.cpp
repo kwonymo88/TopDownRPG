@@ -51,3 +51,4 @@ void AAuraEnemyCharacter::UnHighlightActor()
     	Weapon->SetRenderCustomDepth(false);
     }
 }
+

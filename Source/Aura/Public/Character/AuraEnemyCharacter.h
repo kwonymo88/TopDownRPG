@@ -29,4 +29,13 @@ public:
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
 	// ~ End IEnemyInterface
+
+	// ~ Begin ICombatInterface
+public:
+	FORCEINLINE virtual int32 GetPlayerLevel() const override { return Level;}
+	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Info")
+	int32 Level;
+	// ~ End ICombatInterface
 };

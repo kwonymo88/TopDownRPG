@@ -87,7 +87,7 @@ void AAuraPlayerController::UpdateCursor()
 	}
 	else
 	{
-		if (LastHitEnemyInterface)
+		if (LastHitEnemyInterface.IsValid())
 		{
 			if (LastHitEnemyInterface == ThisHittedEnemyInterface)
 			{
