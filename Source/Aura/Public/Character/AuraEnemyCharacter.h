@@ -36,6 +36,6 @@ public:
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Info")
-	int32 Level;
+	int32 Level = 1;
 	// ~ End ICombatInterface
 };
