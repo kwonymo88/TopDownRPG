@@ -45,6 +45,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes|Default")
 	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes|Default")
+	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 	// End Default Attributes
 	
 public:

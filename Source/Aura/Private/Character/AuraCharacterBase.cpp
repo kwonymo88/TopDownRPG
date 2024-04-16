@@ -47,6 +47,7 @@ void AAuraCharacterBase::InitDefaultAttributes() const
 {
 	ApplySpecToSelf(DefaultPrimaryAttributes);
 	ApplySpecToSelf(DefaultSecondaryAttributes);
+	ApplySpecToSelf(DefaultVitalAttributes);
 }
 
 UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
