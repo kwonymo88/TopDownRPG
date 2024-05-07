@@ -8,6 +8,8 @@
 #include "GameplayEffectTypes.h"
 #include "AuraAttributeSet.generated.h"
 
+struct FGameplayTag;
+
 USTRUCT()
 struct FEffectproperties
 {
@@ -41,6 +43,9 @@ struct FEffectproperties
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+template<class T>
+using TStaticFunPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+
 /**
  * 
  */
@@ -56,6 +61,7 @@ public:
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 
+	TMap<FGameplayTag, TStaticFunPtr<FGameplayAttribute()>> AttributesMap;
 	/*
 	 *	Primary Attributes
 	 */

@@ -3,6 +3,8 @@
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 
+#include "AuraGameplayTags.h"
+
 void UAuraAbilitySystemComponent::InitAbilitySystemInfo()
 {
 	if (!OnGameplayEffectAppliedDelegateToSelf.IsBoundToObject(this))
@@ -14,6 +16,8 @@ void UAuraAbilitySystemComponent::InitAbilitySystemInfo()
 void UAuraAbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor)
 {
 	Super::InitAbilityActorInfo(InOwnerActor, InAvatarActor);
+
+	FAuraGameplayTags::Get().Attributes_Secondary_Armor;
 }
 
 void UAuraAbilitySystemComponent::AppliedEffect(UAbilitySystemComponent* ASComp, const FGameplayEffectSpec& EffectSpec,
